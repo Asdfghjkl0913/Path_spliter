@@ -1,0 +1,46 @@
+#! /usr/bin/python
+import argparse
+import subprocess
+from glob import glob
+
+
+r = 1024 * 1024 * 1024
+
+
+def parse_options():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--filepath",
+                        type=str,
+                        help="filepath that need to be split")
+    parser.add_argument("-s", "--size",
+                        type=int,
+                        help="according to input size in GB")
+    args = parser.parse_args()
+    return args
+
+
+def splitpath(path, threshold):
+    p_size = size(path)
+    if int(p_size)/r < threshold:
+        print path
+    else:
+        list = glob(path+"/*")
+        for item in list:
+            splitpath(item, threshold)
+
+
+def size(path):
+    """disk usage in human readable format (e.g. '2,1GB')"""
+    return subprocess.check_output(['du', '-sb', path]).split()[0]
+
+
+def main():
+    args = parse_options()
+    path = args.filepath
+    threshold = args.size
+    if path:
+        splitpath(path, threshold)
+    return
+
+if __name__ == '__main__':
+    main()
